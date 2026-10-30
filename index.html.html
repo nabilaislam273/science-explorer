@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Science Explorer</title>
+
+<style>
+:root {
+  --bg: #07111f;
+  --panel: #101f34;
+  --panel2: #172c46;
+  --blue: #64d8ff;
+  --purple: #b49aff;
+  --text: #eff6ff;
+  --muted: #a9bdd4;
+  --border: #2b405c;
+  --green: #70efbd;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at top, #152d55, var(--bg) 55%);
+  color: var(--text);
+  font: 16px/1.7 Arial, sans-serif;
+}
+button, input, select { font: inherit; }
+button { cursor: pointer; transition: .2s; }
+button:hover { filter: brightness(1.2); transform: translateY(-2px); }
+header {
+  padding: 20px 5%;
+  background: #0b192c;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.brand { font-size: 28px; font-weight: bold; color: var(--blue); }
+header p { margin: 0; color: var(--muted); }
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 4%;
+  background: #0d1a2c;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.navbtn, .secondary {
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: 11px;
+}
+.navbtn.active {
+  background: linear-gradient(135deg, #1768a6, #704cc0);
+  border-color: var(--blue);
+}
+main { width: min(1150px, 94%); margin: 28px auto 60px; }
+h1 { font-size: clamp(34px, 5vw, 58px); line-height: 1.15; }
+h2, h3 { line-height: 1.3; }
+p { color: #d1deef; }
+.muted { color: var(--muted); }
+.hero {
+  border: 1px solid #315078;
+  border-radius: 24px;
+  min-height: 340px;
+  display: flex;
+  align-items: center;
+  background:
+    linear-gradient(90deg, #071329 5%, #0b2340eF 65%, #07132988),
+    url("https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1500&q=85") center/cover;
+  overflow: hidden;
+}
+.hero > div { padding: clamp(22px, 5vw, 45px); max-width: 760px; }
+.primary {
+  background: linear-gradient(135deg, #1687c9, #7258d8);
+  color: white;
+  border: 1px solid #4a9bd0;
+  padding: 11px 16px;
+  border-radius: 11px;
+  margin: 4px 5px 4px 0;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 245px), 1fr));
+  gap: 17px;
+}
+.card {
+  background: linear-gradient(145deg, var(--panel), #0b192b);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  transition: .2s;
+}
+.card:hover { border-color: #64c8ff88; }
+.card img {
+  display: block;
+  width: 100%;
+  height: 175px;
+  object-fit: cover;
+  background: var(--panel2);
+}
+.pad { padding: 19px; }
+.pill {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 20px;
+  background: #1d3652;
+  color: #b7ddff;
+  font-size: 12px;
+}
+.section { margin-top: 32px; }
+.hidden { display: none !important; }
+.layout {
+  display: grid;
+  grid-template-columns: 265px minmax(0, 1fr);
+  gap: 17px;
+}
+.side { align-self: start; }
+.lesson-link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 12px;
+}
+.lesson-link:hover, .lesson-link.sel { background: #1c3b5b; }
+.lesson-img {
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  border-radius: 14px;
+  margin: 12px 0;
+}
+#lessonContent section {
+  padding: 7px 0 13px;
+  border-bottom: 1px solid #2b405c88;
+}
+#lessonContent section h3 { color: #b9dfff; }
+.note {
+  padding: 15px;
+  border-left: 4px solid var(--blue);
+  background: #132a44;
+  border-radius: 10px;
+  margin: 18px 0;
+}
+input[type="text"], input[type="search"], select {
+  width: 100%;
+  padding: 12px;
+  background: #081629;
+  color: white;
+  border: 1px solid #45617f;
+  border-radius: 10px;
+  margin: 8px 0 14px;
+}
+select option { background: #101f34; }
+label { font-weight: bold; }
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.stat {
+  background: var(--panel2);
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  color: var(--muted);
+}
+.stat strong {
+  display: block;
+  color: var(--blue);
+  font-size: 26px;
+}
+.progress {
+  height: 10px;
+  background: #263b54;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 15px 0;
+}
+.progress div {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+  transition: width .3s;
+}
+.feedback { padding: 14px; border-radius: 10px; margin: 14px 0; }
+.good { background: #103e32; color: #c4ffe0; }
+.bad { background: #49252d; color: #ffd0d6; }
+footer {
+  text-align: center;
+  padding: 26px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+@media(max-width:700px) {
+  .layout { grid-template-columns: 1fr; }
+  .side { max-height: 250px; overflow: auto; }
+  nav { position: static; }
+  .hero { min-height: 300px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div>
+    <div class="brand">🔭 Science Explorer</div>
+    <p>Discover · Learn · Challenge Yourself</p>
+  </div>
+  <span class="pill">YOUR SCIENCE ADVENTURE</span>
+</header>
+
+<nav>
+  <button class="navbtn active" data-page="home">🏠 Home</button>
+  <button class="navbtn" data-page="categories">🔬 Categories</button>
+  <button class="navbtn" data-page="learn">📚 Learn Science</button>
+  <button class="navbtn" data-page="quiz">✍️ Quiz Lab</button>
+  <button class="navbtn" data-page="progress">🏆 My Progress</button>
+</nav>
+
+<main>
+<section id="home" class="page">
+  <div class="hero">
+    <div>
+      <span class="pill">EXPLORE · DISCOVER · LEARN</span>
+      <h1>Curiosity Is Your Superpower!</h1>
+      <p>Explore space, discover life, understand nature and learn how technology changes our world.</p>
+      <button class="primary" onclick="page('learn')">Start Learning →</button>
+      <button class="secondary" onclick="startQuiz('space')">Play Science Quiz</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><strong>6</strong>Science fields</div>
+    <div class="stat"><strong id="homeLessons">18</strong>Learning lessons</div>
+    <div class="stat"><strong id="homeDone">0</strong>Answers submitted</div>
+    <div class="stat"><strong id="homeCorrect">0</strong>Correct answers</div>
+  </div>
+
+  <h2 class="section">🌌 Choose Your Adventure</h2>
+  <div id="homeGrid" class="grid"></div>
+
+  <div class="card pad section">
+    <h2>🌟 Daily Science Challenge</h2>
+    <p>Why do we see lightning before we hear thunder?</p>
+    <button class="primary" onclick="openLesson('physics-light')">Explore the Answer</button>
+  </div>
+</section>
+
+<section id="categories" class="page hidden">
+  <h2>🔬 Explore Science Fields</h2>
+  <p class="muted">Choose a subject to discover lessons, examples and quiz questions.</p>
+  <div id="catGrid" class="grid"></div>
+</section>
+
+<section id="learn" class="page hidden">
+  <h2>📚 Learning Library</h2>
+  <p class="muted">Read carefully, understand the examples and test your knowledge.</p>
+  <div class="layout section">
+    <aside class="card side">
+      <div class="pad">
+        <label for="searchLesson">Search lessons</label>
+        <input id="searchLesson" type="search" placeholder="Search a topic...">
+      </div>
+      <div id="lessonList"></div>
+    </aside>
+    <article class="card pad" id="lessonContent"></article>
+  </div>
+</section>
+
+<section id="quiz" class="page hidden">
+  <div class="card pad">
+    <span class="pill">🧠 SCIENCE QUIZ LAB</span>
+    <h2>Think It. Type It. Learn It.</h2>
+    <p>Answer using your own words. The quiz checks your answer against the accepted answer.</p>
+
+    <label for="quizCat">Science field</label>
+    <select id="quizCat"></select>
+
+    <div class="stats">
+      <div class="stat"><strong id="qCount">1 / 100</strong>Question</div>
+      <div class="stat"><strong id="qScore">0</strong>Correct this session</div>
+      <div class="stat"><strong id="qStreak">0</strong>Correct streak 🔥</div>
+    </div>
+
+    <div class="progress"><div id="qBar"></div></div>
+    <h3 id="question">Loading question...</h3>
+    <p class="muted" id="hint"></p>
+
+    <form id="answerForm">
+      <label for="answer">Write your answer</label>
+      <input id="answer" type="text" required placeholder="Type your answer here...">
+      <button class="primary" type="submit">Check Answer ✓</button>
+      <button class="secondary" type="button" id="hintBtn">💡 Hint</button>
+    </form>
+
+    <div id="feedback" aria-live="polite"></div>
+    <button class="primary" id="nextBtn">Next Question →</button>
+    <button class="secondary" id="randomBtn">🎲 Random Question</button>
+  </div>
+
+  <div class="card pad section">
+    <h3>🧪 Science Mission</h3>
+    <p>After each quiz, write one new fact in your science notebook and explain it in your own words.</p>
+  </div>
+</section>
+
+<section id="progress" class="page hidden">
+  <h2>🏆 Your Science Journey</h2>
+  <div class="stats">
+    <div class="stat"><strong id="pDone">0</strong>Answers submitted</div>
+    <div class="stat"><strong id="pCorrect">0</strong>Correct answers</div>
+    <div class="stat"><strong id="pPercent">0%</strong>Accuracy</div>
+    <div class="stat"><strong id="pBadges">0</strong>Badges earned</div>
+  </div>
+  <div class="card pad">
+    <h3>🎖️ Your Badges</h3>
+    <p id="badges">Answer questions to earn your first badge!</p>
+    <h3>Keep going!</h3>
+    <p id="progressText">Your learning journey starts with one question.</p>
+    <button class="primary" onclick="page('learn')">Continue Learning</button>
+    <button class="secondary" id="reset">Reset Progress</button>
+  </div>
+</section>
+</main>
+
+<footer>Science Explorer · A universe of discovery 🌌</footer>
+
+<script>
+const fields = [
+  {id:"space",name:"Space & Astronomy",icon:"🪐",desc:"Explore planets, stars, galaxies and the universe.",img:"photo-1462331940025-496dfbfc7564"},
+  {id:"physics",name:"Physics",icon:"⚡",desc:"Understand forces, energy, light, sound and motion.",img:"photo-1635070041078-e363dbe005cb"},
+  {id:"biology",name:"Biology",icon:"🧬",desc:"Discover cells, plants, animals and the human body.",img:"photo-1530026405186-ed1f139313f8"},
+  {id:"chemistry",name:"Chemistry",icon:"🧪",desc:"Learn about atoms, matter, elements and reactions.",img:"photo-1532094349884-543bc11b234d"},
+  {id:"earth",name:"Earth Science",icon:"🌍",desc:"Study weather, oceans, rocks and our planet.",img:"photo-1464822759023-fed622ff2c3b"},
+  {id:"technology",name:"Technology",icon:"🤖",desc:"Discover computers, coding, robotics and AI.",img:"photo-1518770660439-4636190af475"}
+];
+
+const lessons = [
+{
+ id:"space-earth",cat:"space",title:"Planet Earth",img:"photo-1446776811953-b23d57bd21aa",
+ intro:"Earth is the third planet from the Sun and the only world currently known to support life. Its atmosphere, liquid water and suitable temperatures make it an extraordinary planet.",
+ sections:[
+ ["Earth in space","Earth travels around the Sun in an orbit and rotates on its axis. One rotation takes approximately 24 hours, creating day and night. One orbit takes about 365.25 days."],
+ ["The atmosphere","Earth's atmosphere is a mixture of gases. Nitrogen makes up most of it, while oxygen is essential for many living organisms. The atmosphere also helps regulate temperature."],
+ ["Water and life","Water covers most of Earth's surface. Living things depend on water for chemical reactions, transport of substances and survival. Earth contains oceans, rivers, lakes, glaciers and groundwater."],
+ ["Gravity and the Moon","Gravity attracts objects with mass. Earth's gravity keeps us on the ground and holds much of its atmosphere. The Moon orbits Earth, and its gravity helps cause ocean tides."],
+ ["Example and revision","The Sun is a star, Earth is a planet, and the Moon is Earth's natural satellite. Earth's average distance from the Sun is about 150 million kilometres."]
+ ],
+ facts:[
+ ["Which planet is our home?","Earth"],["Which star does Earth orbit?","the Sun"],
+ ["What force attracts objects toward Earth?","gravity"],["What is Earth's natural satellite?","the Moon"],
+ ["What produces day and night?","Earth's rotation"],["How long is one Earth orbit?","about 365.25 days"],
+ ["Which gas makes up most of Earth's atmosphere?","nitrogen"],["What covers most of Earth's surface?","water"],
+ ["What causes ocean tides mainly?","the Moon's gravity"],["What is the approximate average Earth-Sun distance?","150 million kilometres"]
+ ]
+},
+{
+ id:"space-solar",cat:"space",title:"The Solar System",img:"photo-1462331940025-496dfbfc7564",
+ intro:"The Solar System includes the Sun and the objects that travel around it, held together mainly by gravity.",
+ sections:[
+ ["The Sun","The Sun is a star made mostly of hydrogen and helium. Nuclear fusion in its core releases energy that eventually reaches Earth as light and heat."],
+ ["The eight planets","The planets in order are Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune. The inner planets are rocky, while the outer planets are much larger."],
+ ["Small Solar System objects","Asteroids are mainly rocky objects. Comets contain ice, dust and rocky material and can develop glowing tails when they approach the Sun. Many planets also have moons."],
+ ["Gravity and orbits","Gravity helps keep planets in orbit around the Sun. Planets farther away generally take longer to complete an orbit."],
+ ["Compare and think","Earth has liquid water on its surface. Other planets have very different temperatures, atmospheres and landscapes. Scientists use telescopes and spacecraft to study them."]
+ ],
+ facts:[
+ ["How many recognised planets orbit the Sun?","eight"],["What is the Sun?","a star"],
+ ["Which planet is nearest the Sun?","Mercury"],["Which planet is famous for its rings?","Saturn"],
+ ["Which planet is the largest?","Jupiter"],["Which planet is known as the Red Planet?","Mars"],
+ ["Which planet is farthest from the Sun?","Neptune"],["What force helps keep planets in orbit?","gravity"],
+ ["What are comets partly made of?","ice and dust"],["Which planet do we live on?","Earth"]
+ ]
+},
+{
+ id:"space-stars",cat:"space",title:"Stars and Galaxies",img:"photo-1462331940025-496dfbfc7564",
+ intro:"Stars are enormous hot spheres of gas. Galaxies contain stars, gas, dust and dark matter held together by gravity.",
+ sections:[
+ ["How stars shine","Stars release energy through nuclear fusion in their cores. In this process, light atomic nuclei combine and release energy."],
+ ["Star colours","A star's colour is related to its surface temperature. Blue-white stars are generally hotter than red stars."],
+ ["The life of a star","Stars form from clouds of gas and dust. Their later evolution depends strongly on their initial mass. Some massive stars end in supernova explosions."],
+ ["Galaxies","A galaxy is a huge system of stars and other material. Our Solar System is in the Milky Way galaxy."],
+ ["Observing the universe","Telescopes collect light and other signals from distant objects. Because light takes time to travel, distant objects are seen as they were in the past."]
+ ],
+ facts:[
+ ["What is a star?","a hot sphere of gas"],["What process releases energy in a star?","nuclear fusion"],
+ ["What galaxy contains our Solar System?","the Milky Way"],["What does a telescope collect?","light"],
+ ["What does a star's colour relate to?","surface temperature"],["What is a galaxy?","a system of stars and other material"],
+ ["What can a massive star produce at the end of its life?","a supernova"],["What force helps hold galaxies together?","gravity"],
+ ["What are stars formed from?","gas and dust"],["Why do we see distant objects in the past?","light takes time to travel"]
+ ]
+},
+{
+ id:"physics-forces",cat:"physics",title:"Forces and Motion",img:"photo-1635070041078-e363dbe005cb",
+ intro:"Physics studies matter, energy and the rules that describe how the universe works. Forces can change an object's speed, direction or shape.",
+ sections:[
+ ["What is a force?","A force is a push or pull. The SI unit of force is the newton. Forces can act through direct contact or at a distance."],
+ ["Balanced forces","When forces balance, the net force is zero. An object at rest remains at rest, while a moving object continues at constant velocity if no net force acts."],
+ ["Acceleration","A non-zero net force causes acceleration. Acceleration means a change in velocity, which can involve a change in speed or direction."],
+ ["Friction and gravity","Friction opposes relative motion between surfaces. Gravity attracts masses and pulls unsupported objects toward Earth."],
+ ["Newton's second law","For a constant mass, Newton's second law is expressed as F = ma. Net force equals mass multiplied by acceleration."]
+ ],
+ facts:[
+ ["What is a force?","a push or pull"],["What is the SI unit of force?","newton"],
+ ["What force attracts objects toward Earth?","gravity"],["What force opposes sliding surfaces?","friction"],
+ ["What does F = ma describe?","Newton's second law"],["What is the SI unit of mass?","kilogram"],
+ ["What happens when a nonzero net force acts?","acceleration"],["What does acceleration mean?","a change in velocity"],
+ ["What is the SI unit of speed?","metres per second"],["What is the unit of force?","newton"]
+ ]
+},
+{
+ id:"physics-light",cat:"physics",title:"Light and Sound",img:"photo-1500530855697-b586d89ba3ee",
+ intro:"Light and sound carry energy, but they travel in different ways. Understanding them helps explain vision, hearing and many technologies.",
+ sections:[
+ ["Light","Light is an electromagnetic wave. It can travel through a vacuum, and its speed in a vacuum is approximately 300,000 kilometres per second."],
+ ["Reflection","Reflection occurs when light bounces off a surface. Mirrors use reflection to form images."],
+ ["Refraction","Refraction is a change in direction when light passes from one material into another at an angle. Lenses use refraction to focus light."],
+ ["Sound waves","Sound is produced by vibrations. Sound normally needs a material medium, such as air, water or a solid, to travel."],
+ ["Pitch and loudness","Pitch is related to frequency. Loudness is related to sound intensity and how our ears perceive it. Lightning is seen before thunder is heard because light travels much faster than sound."]
+ ],
+ facts:[
+ ["Which travels faster, light or sound?","light"],["Can sound travel through a vacuum?","no"],
+ ["What produces sound?","vibrations"],["What is the bouncing of light called?","reflection"],
+ ["What is the bending of light between materials called?","refraction"],["What determines sound pitch?","frequency"],
+ ["What is the approximate speed of light in vacuum?","300000 kilometres per second"],
+ ["What unit measures frequency?","hertz"],["What do we see before hearing thunder?","lightning"],
+ ["What can a lens use to focus light?","refraction"]
+ ]
+},
+{
+ id:"physics-electricity",cat:"physics",title:"Electricity and Energy",img:"photo-1518837695005-2083093ee35b",
+ intro:"Energy is the ability to cause change or do work. Electricity is used to power lights, computers, motors and many everyday devices.",
+ sections:[
+ ["Forms of energy","Energy includes kinetic, potential, thermal, chemical, electrical and light energy. Energy can be transferred and transformed from one form to another."],
+ ["Electric charge","Matter contains positive and negative electric charges. Like charges repel, while opposite charges attract."],
+ ["Electric circuits","A simple circuit may contain a cell, wires and a lamp. Current flows when there is a complete conducting path."],
+ ["Conductors and insulators","Metals such as copper are good electrical conductors. Materials such as rubber are commonly used as insulators."],
+ ["Energy conservation","Energy is not created or destroyed in an ordinary energy transfer; it changes form or moves between objects. Safe electrical practice is important."]
+ ],
+ facts:[
+ ["What is the ability to do work called?","energy"],["What is the flow of electric charge called?","electric current"],
+ ["What is needed for a complete current path?","a closed circuit"],["Name a good electrical conductor.","copper"],
+ ["Name a common electrical insulator.","rubber"],["What do like electric charges do?","repel"],
+ ["What do opposite electric charges do?","attract"],["What type of energy does a moving object have?","kinetic energy"],
+ ["What type of energy is stored because of position?","potential energy"],["What principle says energy changes form rather than disappearing?","conservation of energy"]
+ ]
+},
+{
+ id:"biology-cells",cat:"biology",title:"Cells and Living Things",img:"photo-1530026405186-ed1f139313f8",
+ intro:"Cells are the basic structural and functional units of living organisms. Some organisms consist of one cell, while others contain many specialised cells.",
+ sections:[
+ ["Cell structures","Many cells have a cell membrane, cytoplasm and genetic material. Eukaryotic cells have a nucleus; bacteria do not have a membrane-bound nucleus."],
+ ["Plant cells","Typical plant cells have a cell wall outside the membrane. Many contain chloroplasts for photosynthesis and a large central vacuole."],
+ ["Animal cells","Animal cells have a cell membrane and cytoplasm. Many also contain a nucleus and mitochondria."],
+ ["Organisation","In multicellular organisms, specialised cells form tissues, tissues form organs, and organs work together in organ systems."],
+ ["Why cells matter","Cell biology helps explain growth, inheritance, disease and how living organisms function."]
+ ],
+ facts:[
+ ["What is the basic unit of life?","cell"],["What surrounds a cell's contents?","cell membrane"],
+ ["What structure contains most DNA in a typical animal cell?","nucleus"],
+ ["Which structures carry out photosynthesis?","chloroplasts"],["What is the jelly-like material inside cells?","cytoplasm"],
+ ["What supports plant cells outside the membrane?","cell wall"],["Which organelles release usable energy from food?","mitochondria"],
+ ["What is a group of similar cells called?","tissue"],["What molecule carries genetic information?","DNA"],
+ ["What do tissues combine to form?","organs"]
+ ]
+},
+{
+ id:"biology-plants",cat:"biology",title:"Plants and Photosynthesis",img:"photo-1416879595882-3373a0480b5b",
+ intro:"Plants use sunlight, water and carbon dioxide to make sugars. They are essential to ecosystems because they provide food and habitats.",
+ sections:[
+ ["Photosynthesis","Green plants use light energy to make sugars from carbon dioxide and water. Oxygen is released during the process."],
+ ["Chlorophyll","Chlorophyll is a pigment in chloroplasts that absorbs light energy. Many leaves appear green because chlorophyll reflects green light more strongly than some other wavelengths."],
+ ["Roots and leaves","Roots often absorb water and minerals. Leaves capture light and exchange gases through tiny openings called stomata."],
+ ["Transport","Xylem transports water and minerals. Phloem transports sugars and other organic substances around the plant."],
+ ["Importance","Plants support food chains, provide habitats and materials, and photosynthesis contributes oxygen to the atmosphere."]
+ ],
+ facts:[
+ ["What process lets plants make sugars using light?","photosynthesis"],
+ ["Which gas is absorbed during photosynthesis?","carbon dioxide"],
+ ["Which gas is released during photosynthesis?","oxygen"],["What pigment absorbs light in plants?","chlorophyll"],
+ ["Which plant organ often absorbs water?","roots"],["What are tiny leaf openings called?","stomata"],
+ ["Which tissue transports water in plants?","xylem"],["Which tissue transports sugars?","phloem"],
+ ["What energy source powers photosynthesis?","sunlight"],["What is a main sugar produced by photosynthesis?","glucose"]
+ ]
+},
+{
+ id:"biology-human",cat:"biology",title:"The Human Body",img:"photo-1576091160399-112ba8d25d1d",
+ intro:"The human body contains organ systems that work together to maintain life. Each system has particular functions, but none works entirely alone.",
+ sections:[
+ ["Digestive system","The digestive system breaks food into smaller molecules that the body can absorb. Nutrients provide energy and materials for growth and repair."],
+ ["Circulatory system","The heart pumps blood through blood vessels. Blood transports oxygen, nutrients and other substances around the body."],
+ ["Respiratory system","The respiratory system brings oxygen into the body and removes carbon dioxide. Gas exchange takes place in the lungs."],
+ ["Nervous system","The brain, spinal cord and nerves coordinate responses to information from inside and outside the body."],
+ ["Healthy body","Sleep, physical activity, balanced nutrition and hygiene support normal body functions. Different people have different needs."]
+ ],
+ facts:[
+ ["Which organ pumps blood?","heart"],["Which organ is mainly used for breathing?","lungs"],
+ ["Which organ coordinates many body activities?","brain"],["What system breaks down food?","digestive system"],
+ ["What carries oxygen around the body?","blood"],["What gas do humans need for cellular respiration?","oxygen"],
+ ["What waste gas is exhaled?","carbon dioxide"],["What system carries signals around the body?","nervous system"],
+ ["Where does gas exchange occur in the lungs?","alveoli"],["What provides materials for growth and repair?","nutrients"]
+ ]
+},
+{
+ id:"chemistry-atoms",cat:"chemistry",title:"Atoms and Elements",img:"photo-1532094349884-543bc11b234d",
+ intro:"Chemistry studies matter, its properties, its structure and the changes it undergoes. Atoms are the basic units of chemical elements.",
+ sections:[
+ ["Inside an atom","An atom contains a small nucleus surrounded by electrons. The nucleus contains positively charged protons and, in most atoms, neutral neutrons."],
+ ["Elements","An element is a substance made of one type of atom. An element's identity depends on the number of protons in its atoms."],
+ ["Atomic number","The atomic number equals the number of protons in the nucleus. Atoms of the same element may contain different numbers of neutrons."],
+ ["Compounds and molecules","A compound contains two or more different elements chemically combined. A molecule consists of atoms joined by chemical bonds."],
+ ["Chemical symbols","Symbols are international abbreviations. H represents hydrogen, O represents oxygen, C represents carbon, and Fe represents iron."]
+ ],
+ facts:[
+ ["What is the basic unit of a chemical element?","atom"],["Which particle has a positive charge?","proton"],
+ ["Which particle has a negative charge?","electron"],["Which particle has no electric charge?","neutron"],
+ ["What determines an element's identity?","number of protons"],["What is the symbol for oxygen?","O"],
+ ["What is the symbol for carbon?","C"],["What is the symbol for iron?","Fe"],
+ ["What is a substance containing chemically combined elements called?","compound"],
+ ["What is the centre of an atom called?","nucleus"]
+ ]
+},
+{
+ id:"chemistry-matter",cat:"chemistry",title:"States of Matter",img:"photo-1532187863486-abf9dbad1b69",
+ intro:"Matter has mass and occupies space. The arrangement and movement of particles help explain the properties of solids, liquids and gases.",
+ sections:[
+ ["Solids","Particles in a solid are closely packed and generally vibrate around fixed positions. A solid usually keeps its shape and volume."],
+ ["Liquids","Particles in a liquid can move past one another. A liquid has a fixed volume but takes the shape of its container."],
+ ["Gases","Gas particles move freely and are widely spaced compared with particles in solids and liquids. A gas expands to fill its container."],
+ ["Changes of state","Melting changes a solid to a liquid; freezing changes liquid to solid; evaporation and boiling change liquid to gas; condensation changes gas to liquid."],
+ ["Heating and cooling","Heating generally increases particle energy. Cooling generally reduces particle energy and may lead to a change of state."]
+ ],
+ facts:[
+ ["Which state usually keeps a fixed shape?","solid"],["Which state has fixed volume but takes its container's shape?","liquid"],
+ ["Which state expands to fill its container?","gas"],["What is solid changing into liquid called?","melting"],
+ ["What is liquid changing into solid called?","freezing"],["What is gas changing into liquid called?","condensation"],
+ ["What is liquid changing into gas at a surface called?","evaporation"],
+ ["What is the boiling point of pure water at standard pressure?","100 degrees celsius"],
+ ["What usually happens to particle motion when heated?","it increases"],
+ ["What is matter?","anything that has mass and occupies space"]
+ ]
+},
+{
+ id:"chemistry-reactions",cat:"chemistry",title:"Chemical Reactions",img:"photo-1532187863486-abf9dbad1b69",
+ intro:"Chemical reactions rearrange atoms to form new substances. Reactants are changed into products, while atoms are conserved.",
+ sections:[
+ ["Reactants and products","Reactants are the starting substances in a chemical reaction. Products are the new substances formed."],
+ ["Signs of a reaction","Possible signs include a colour change, gas production, a temperature change or formation of a solid. These signs need to be interpreted carefully."],
+ ["Conservation of mass","In a closed system, total mass is conserved during a chemical reaction because atoms are rearranged rather than created or destroyed."],
+ ["Reaction energy","Some reactions release energy to their surroundings; others absorb energy. Combustion is a common example of an energy-releasing reaction."],
+ ["Everyday chemistry","Cooking, rusting, digestion and batteries involve chemical changes. Scientists use experiments and equations to study reactions."]
+ ],
+ facts:[
+ ["What are starting substances in a reaction called?","reactants"],["What are newly formed substances called?","products"],
+ ["What is conserved during an ordinary chemical reaction?","mass"],["What is a possible sign of gas formation?","bubbles"],
+ ["What type of reaction burns a fuel in oxygen?","combustion"],["What does a chemical equation represent?","a chemical reaction"],
+ ["What happens to atoms during a reaction?","they are rearranged"],["Does rusting involve a chemical change?","yes"],
+ ["What is the study of matter and its changes called?","chemistry"],["What can some reactions release?","energy"]
+ ]
+},
+{
+ id:"earth-weather",cat:"earth",title:"Weather and Climate",img:"photo-1534088568595-a066f410bcda",
+ intro:"Weather describes atmospheric conditions over short periods. Climate describes long-term patterns and averages over many years.",
+ sections:[
+ ["Weather conditions","Weather includes temperature, wind, rainfall, humidity, air pressure and cloud cover. Conditions can change from hour to hour."],
+ ["Climate patterns","Climate is studied using observations over long periods. It helps describe the typical conditions of a region and how those conditions vary."],
+ ["Weather instruments","Thermometers measure temperature, anemometers measure wind speed, and rain gauges measure rainfall."],
+ ["The water cycle","Evaporation, condensation and precipitation move water between Earth's surface and atmosphere."],
+ ["Forecasts and safety","Weather forecasts use observations and computer models. Warnings help people prepare for storms, heat and flooding."]
+ ],
+ facts:[
+ ["What is the long-term pattern of weather called?","climate"],
+ ["What instrument measures temperature?","thermometer"],
+ ["What instrument measures wind speed?","anemometer"],
+ ["What instrument measures rainfall?","rain gauge"],
+ ["What is liquid water becoming vapour called?","evaporation"],
+ ["What is water vapour becoming liquid called?","condensation"],
+ ["What is water falling from clouds called?","precipitation"],
+ ["What is moving air called?","wind"],["What does humidity describe?","water vapour in air"],
+ ["What helps predict future weather?","weather forecasts"]
+ ]
+},
+{
+ id:"earth-water",cat:"earth",title:"The Water Cycle",img:"photo-1433086966358-54859d0ed716",
+ intro:"Water moves continuously between oceans, land and the atmosphere. This movement is called the water cycle.",
+ sections:[
+ ["Evaporation","Liquid water gains energy and becomes water vapour. Sunlight supplies much of the energy that drives evaporation."],
+ ["Condensation","When moist air cools sufficiently, water vapour may form tiny droplets or ice crystals. These can form clouds."],
+ ["Precipitation","Water returns to the surface as rain, snow, sleet or hail. The type depends on atmospheric conditions."],
+ ["Collection and runoff","Water collects in rivers, lakes and oceans, flows over land as runoff, or enters the ground and replenishes groundwater."],
+ ["Why the cycle matters","The water cycle redistributes freshwater, influences weather and supports ecosystems, agriculture and human communities."]
+ ],
+ facts:[
+ ["What process changes liquid water into vapour?","evaporation"],
+ ["What process forms droplets from water vapour?","condensation"],
+ ["What is rain an example of?","precipitation"],
+ ["What provides much of the energy driving the water cycle?","the Sun"],
+ ["What is water stored underground called?","groundwater"],
+ ["What is water flowing over land called?","runoff"],
+ ["Where does water collect after flowing down rivers?","oceans"],
+ ["What can clouds contain?","water droplets and ice crystals"],
+ ["What cycle moves water around Earth?","water cycle"],
+ ["Why is the water cycle important?","it redistributes water"]
+ ]
+},
+{
+ id:"earth-rocks",cat:"earth",title:"Rocks and Earth's Structure",img:"photo-1464822759023-fed622ff2c3b",
+ intro:"Earth has several internal layers and a surface that changes through geological processes. Rocks provide evidence about Earth's history.",
+ sections:[
+ ["Earth's layers","Earth has a crust, mantle and core. The crust is the thin outer layer; the mantle lies beneath it, and the core occupies the centre."],
+ ["Three rock groups","Igneous rocks form when molten rock cools. Sedimentary rocks form from accumulated sediments. Metamorphic rocks change under heat and pressure."],
+ ["Weathering and erosion","Weathering breaks down rock in place. Erosion transports rock fragments by water, wind, ice or gravity."],
+ ["Plate tectonics","Earth's outer shell is divided into moving tectonic plates. Interactions between plates can produce earthquakes, volcanoes and mountain ranges."],
+ ["A changing planet","Some geological changes occur slowly over millions of years. Others, such as earthquakes and volcanic eruptions, can occur rapidly."]
+ ],
+ facts:[
+ ["What is Earth's thin outer layer called?","crust"],["What are rocks formed from?","minerals"],
+ ["What type of rock forms when molten rock cools?","igneous rock"],
+ ["What type of rock forms from accumulated sediments?","sedimentary rock"],
+ ["What can heat and pressure form from existing rock?","metamorphic rock"],
+ ["What are Earth's moving outer sections called?","tectonic plates"],
+ ["What is the breakdown of rock in place called?","weathering"],
+ ["What is the transport of rock material called?","erosion"],
+ ["What natural event can occur at plate boundaries?","earthquakes"],
+ ["What is molten rock below Earth's surface called?","magma"]
+ ]
+},
+{
+ id:"tech-computers",cat:"technology",title:"How Computers Work",img:"photo-1518770660439-4636190af475",
+ intro:"Computers accept information, process it according to instructions and produce results. They combine hardware and software to perform tasks.",
+ sections:[
+ ["Input","Input devices provide data or instructions. Examples include keyboards, microphones, cameras and sensors."],
+ ["Processing","The central processing unit, or CPU, executes instructions. A computer uses memory and storage to work with and keep information."],
+ ["Output","Output devices present results. Monitors show images, speakers produce sound and printers make physical copies."],
+ ["Hardware and software","Hardware is the physical equipment. Software consists of programs and instructions that tell hardware what to do."],
+ ["Digital safety","Use strong, unique passwords, keep software updated and avoid sharing private information with untrusted websites."]
+ ],
+ facts:[
+ ["Which device is commonly used to type text?","keyboard"],
+ ["What does CPU stand for?","central processing unit"],
+ ["What device displays visual output?","monitor"],
+ ["What is the physical equipment of a computer called?","hardware"],
+ ["What are programs and instructions called?","software"],
+ ["What device produces sound output?","speaker"],
+ ["What is temporary working memory commonly called?","RAM"],
+ ["What stores files for later use?","storage"],
+ ["What device can capture images for a computer?","camera"],
+ ["What should you use to protect accounts?","strong unique passwords"]
+ ]
+},
+{
+ id:"tech-robots",cat:"technology",title:"Robotics and Artificial Intelligence",img:"photo-1485827404703-89b55fcc595e",
+ intro:"Robotics combines mechanical systems, electronics and programming. Artificial intelligence, or AI, helps computers perform tasks such as recognising patterns.",
+ sections:[
+ ["Robot components","Many robots use sensors to gather information, a controller to process it and actuators such as motors to move."],
+ ["Programming","Programs give computers and robots instructions. A robot may react to sensor readings or repeat a sequence of tasks."],
+ ["Artificial intelligence","AI systems can help recognise images, process language, identify patterns and make predictions. Their output can still contain mistakes."],
+ ["Real-world applications","Robots can assist in manufacturing, exploration, agriculture, healthcare and tasks that are repetitive or hazardous."],
+ ["Responsible technology","People should consider safety, privacy, reliability, fairness and human oversight when designing and using AI."]
+ ],
+ facts:[
+ ["What does AI stand for?","artificial intelligence"],
+ ["What component detects the environment?","sensor"],
+ ["What part may move a robot's arm?","motor"],
+ ["What gives a computer instructions?","program"],
+ ["What field combines machines and control systems to build robots?","robotics"],
+ ["Can AI make mistakes?","yes"],
+ ["What can a camera sensor detect?","light and images"],
+ ["What controls the steps a robot follows?","program"],
+ ["Name one common robot application.","manufacturing"],
+ ["Why should AI be tested?","to check reliability and safety"]
+ ]
+},
+{
+ id:"tech-internet",cat:"technology",title:"Internet, Coding and Data",img:"photo-1518770660439-4636190af475",
+ intro:"The internet connects devices around the world. Websites, software and code help devices exchange information and perform useful tasks.",
+ sections:[
+ ["How the internet works","Devices exchange data through networks using agreed rules called protocols. Information is often divided into packets for transmission."],
+ ["Websites and browsers","A web browser requests and displays web pages. HTML describes page structure, CSS controls appearance, and JavaScript adds interactivity."],
+ ["Algorithms","An algorithm is a clear sequence of steps for solving a problem or completing a task. Programs implement algorithms using instructions."],
+ ["Data and privacy","Websites may collect information. Share only what is necessary, use unique passwords and check that a website is trustworthy."],
+ ["Debugging","Programmers test code, find errors called bugs and revise their programs. Small, frequent tests make problems easier to understand."]
+ ],
+ facts:[
+ ["What is a clear sequence of problem-solving steps called?","algorithm"],
+ ["What does HTML mainly describe?","web page structure"],
+ ["What does CSS control on a web page?","presentation and styling"],
+ ["Which language can add interactivity to a web page?","JavaScript"],
+ ["What is a small unit of data sent over a network called?","packet"],
+ ["What software displays web pages?","web browser"],
+ ["What is an error in a program often called?","bug"],
+ ["What do programmers do to find and fix errors?","debugging"],
+ ["Why should passwords be unique?","to protect accounts"],
+ ["What connects devices and networks worldwide?","the internet"]
+ ]
+}
+];
+
+const $ = id => document.getElementById(id);
+const imageURL = id =>
+  "https://images.unsplash.com/" + id + "?auto=format&fit=crop&w=1100&q=85";
+
+let current = lessons[0];
+let pool = [];
+let qi = 0;
+let locked = false;
+let streak = 0;
+let session = 0;
+
+function getStats() {
+  try {
+    return JSON.parse(localStorage.getItem("scienceExplorerStats")) ||
+      {done:0, correct:0};
+  } catch(e) {
+    return {done:0, correct:0};
+  }
+}
+function putStats(stats) {
+  try {
+    localStorage.setItem("scienceExplorerStats", JSON.stringify(stats));
+  } catch(e) {}
+}
+
+function page(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
+  $(id).classList.remove("hidden");
+  document.querySelectorAll(".navbtn").forEach(b =>
+    b.classList.toggle("active", b.dataset.page === id)
+  );
+  if (id === "progress") updateProgress();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+document.querySelectorAll(".navbtn").forEach(b => {
+  b.onclick = () => page(b.dataset.page);
+});
+
+function catCard(c) {
+  return `<article class="card">
+    <img loading="lazy" src="${imageURL(c.img)}" alt="${c.name}">
+    <div class="pad">
+      <span class="pill">${c.icon} SCIENCE FIELD</span>
+      <h3>${c.name}</h3>
+      <p>${c.desc}</p>
+      <button class="primary" onclick="filterCat('${c.id}')">Explore Field →</button>
+    </div>
+  </article>`;
+}
+function renderCategories() {
+  $("homeGrid").innerHTML = fields.map(catCard).join("");
+  $("catGrid").innerHTML = fields.map(catCard).join("");
+}
+
+function listLessons(term = "") {
+  const found = lessons.filter(l =>
+    (l.title + " " + l.intro + " " + l.cat)
+      .toLowerCase().includes(term.toLowerCase())
+  );
+  $("lessonList").innerHTML = found.map(l => {
+    const f = fields.find(c => c.id === l.cat);
+    return `<button class="lesson-link ${l.id === current.id ? "sel" : ""}"
+      onclick="openLesson('${l.id}')">${f.icon} ${l.title}</button>`;
+  }).join("") || "<p class='pad muted'>No lessons found.</p>";
+}
+
+function renderLesson(lesson) {
+  current = lesson;
+  const field = fields.find(f => f.id === lesson.cat);
+  $("lessonContent").innerHTML = `
+    <span class="pill">${field.name.toUpperCase()}</span>
+    <h2>${lesson.title}</h2>
+    <p>${lesson.intro}</p>
+    <img class="lesson-img" src="${imageURL(lesson.img)}" alt="${lesson.title}">
+    <h3>📖 Detailed Study Guide</h3>
+    ${lesson.sections.map((s,i) =>
+      `<section><h3>${i+1}. ${s[0]}</h3><p>${s[1]}</p></section>`
+    ).join("")}
+    <div class="note">
+      <h3>🧠 Check Your Understanding</h3>
+      <p>Summarise what you learned. Can you explain the main ideas without looking at the lesson?</p>
+      <button class="primary" onclick="startQuiz('${lesson.cat}')">Quiz This Field →</button>
+    </div>`;
+  listLessons($("searchLesson").value);
+}
+function openLesson(id) {
+  const lesson = lessons.find(l => l.id === id);
+  if (!lesson) return;
+  renderLesson(lesson);
+  page("learn");
+}
+function filterCat(id) {
+  const lesson = lessons.find(l => l.cat === id);
+  if (lesson) openLesson(lesson.id);
+}
+$("searchLesson").addEventListener("input", e => listLessons(e.target.value));
+
+function normal(s) {
+  return s.toLowerCase().trim()
+    .replace(/[.,!?;:]/g, "")
+    .replace(/\s+/g, " ");
+}
+function hash(s) {
+  let h = 2166136261;
+  for (let i=0; i<s.length; i++) {
+    h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  }
+  return h >>> 0;
+}
+
+const questionBank = {
+  "space": [["What is the closest star to Earth?", "the Sun"], ["What is the name of Earth's galaxy?", "the Milky Way"], ["How many planets are in the Solar System?", "eight"], ["Which planet has the shortest year?", "Mercury"], ["Which planet has the longest year?", "Neptune"], ["Which planet has the hottest average surface?", "Venus"], ["Which planet is largest by diameter?", "Jupiter"], ["Which planet is famous for its prominent rings?", "Saturn"], ["Which planet rotates on its side?", "Uranus"], ["Which planet has the Great Red Spot?", "Jupiter"], ["What is the region beyond Neptune containing many icy bodies called?", "the Kuiper Belt"], ["What is the distant spherical region of icy objects surrounding the Solar System called?", "the Oort Cloud"], ["What is a small rocky object orbiting the Sun called?", "an asteroid"], ["What is an icy object that can form a tail near the Sun called?", "a comet"], ["What is a space rock that reaches Earth's surface called?", "a meteorite"], ["What is the streak of light from a space rock in the atmosphere called?", "a meteor"], ["What is the name of Earth's natural satellite?", "the Moon"], ["What causes the phases of the Moon?", "the changing view of its sunlit half"], ["What causes a solar eclipse?", "the Moon passes between Earth and the Sun"], ["What causes a lunar eclipse?", "Earth passes between the Sun and the Moon"], ["What force keeps planets in orbit around the Sun?", "gravity"], ["What is the path of an object around another object called?", "an orbit"], ["What is the spinning of a planet around its axis called?", "rotation"], ["What is a planet's trip around the Sun called?", "revolution"], ["About how long does Earth take to rotate once?", "24 hours"], ["About how long does Earth take to orbit the Sun?", "365.25 days"], ["What is the boundary around a black hole beyond which light cannot escape called?", "the event horizon"], ["What is a black hole?", "an object whose gravity is so strong that light cannot escape from within its event horizon"], ["What is the explosion marking the end of some massive stars called?", "a supernova"], ["What is a cloud of gas and dust where stars can form called?", "a nebula"], ["What process powers stars?", "nuclear fusion"], ["Which element is most abundant in the Sun?", "hydrogen"], ["What is the closest planet to the Sun?", "Mercury"], ["Which planet is known for its reddish appearance?", "Mars"], ["Which planet has a thick carbon-dioxide atmosphere and runaway greenhouse warming?", "Venus"], ["Which planet is known to have liquid-water oceans on its surface?", "Earth"], ["What is the largest moon in the Solar System?", "Ganymede"], ["Which planet has the moon Titan?", "Saturn"], ["Which planet has the moon Europa?", "Jupiter"], ["What is the name of Mars's largest volcano?", "Olympus Mons"], ["What is the name of the large canyon system on Mars?", "Valles Marineris"], ["What is the name of the spacecraft that first carried humans to the Moon?", "Apollo 11"], ["In what year did humans first land on the Moon?", "1969"], ["What was the first artificial satellite called?", "Sputnik 1"], ["Which space telescope launched in 1990 transformed visible-light astronomy?", "the Hubble Space Telescope"], ["Which space telescope launched in 2021 observes mainly infrared light?", "the James Webb Space Telescope"], ["What is the study of the universe beyond Earth called?", "astronomy"], ["What instrument gathers light from distant celestial objects?", "a telescope"], ["What does a spectroscope help astronomers analyse?", "the wavelengths of light"], ["What can a star's spectrum reveal about its composition?", "the elements present"], ["What is the apparent shift in a nearby star's position against distant stars called?", "parallax"], ["What unit is commonly used for distances between stars?", "the light-year"], ["What does one light-year measure?", "distance"], ["What is the average distance from Earth to the Sun called?", "an astronomical unit"], ["What is the name of the galaxy group that includes the Milky Way and Andromeda?", "the Local Group"], ["What type of galaxy is the Milky Way?", "a barred spiral galaxy"], ["What is the nearest large galaxy to the Milky Way?", "the Andromeda Galaxy"], ["What is the central supermassive black hole of the Milky Way called?", "Sagittarius A*"], ["What is the study of the origin and evolution of the universe called?", "cosmology"], ["What theory describes the universe's early expansion from a hot, dense state?", "the Big Bang theory"], ["What observation shows that many distant galaxies are moving away from us?", "redshift"], ["What is the invisible mass inferred from its gravitational effects called?", "dark matter"], ["What name is given to the unknown component associated with the universe's accelerating expansion?", "dark energy"], ["What is the boundary marking the observable limit of the universe called?", "the cosmic horizon"], ["Why do distant stars appear as they were in the past?", "their light takes time to reach us"], ["What is the bright band of stars across the night sky called?", "the Milky Way"], ["What is a group of stars forming a recognised pattern called?", "a constellation"], ["Which star is currently close to the north celestial pole?", "Polaris"], ["What is the brightest star in Earth's night sky?", "Sirius"], ["What is the name of the star cluster also called the Seven Sisters?", "the Pleiades"], ["What is a planet outside our Solar System called?", "an exoplanet"], ["What method detects some exoplanets by measuring a star's slight dimming?", "the transit method"], ["What method detects some exoplanets through a star's wobble?", "the radial velocity method"], ["What is the region around a star where liquid water may exist on a planet's surface called?", "the habitable zone"], ["What is a planet that orbits two stars sometimes called?", "a circumbinary planet"], ["What is the boundary between Earth's atmosphere and space often conventionally called?", "the Kármán line"], ["What protects Earth from much of the solar wind?", "the magnetosphere"], ["What stream of charged particles flows outward from the Sun?", "the solar wind"], ["What is a sudden burst of energy and radiation from the Sun called?", "a solar flare"], ["What is a large eruption of solar material into space called?", "a coronal mass ejection"], ["What lights up the sky near Earth's polar regions?", "auroras"], ["What causes most of Earth's seasons?", "Earth's axial tilt"], ["Why does the Moon keep nearly the same face toward Earth?", "it rotates once in about the same time it orbits Earth"], ["What is the dark central part of a shadow during an eclipse called?", "the umbra"], ["What is the lighter outer part of a shadow called?", "the penumbra"], ["What is a spacecraft that travels around a planet called?", "an orbiter"], ["What is a spacecraft designed to land on a surface called?", "a lander"], ["What is a robotic vehicle that explores a planetary surface called?", "a rover"], ["What is the name of NASA's Mars rover that landed in 2021?", "Perseverance"], ["What is the name of the first human-made object to enter interstellar space?", "Voyager 1"], ["What is the main purpose of a spacesuit?", "to provide life support and protection in space"], ["What is microgravity?", "a condition of very small apparent weight during free fall"], ["What is the name of the point where a spacecraft's gravity assists can change its path?", "a gravity-assist flyby"], ["What is the study of how celestial objects move and interact under gravity called?", "celestial mechanics"], ["What is a pair of stars orbiting a common centre of mass called?", "a binary star system"], ["What is a star that suddenly increases greatly in brightness called?", "a nova"], ["What is a rapidly rotating neutron star emitting beams of radiation called?", "a pulsar"], ["What extremely dense remnant can form after a massive star explodes?", "a neutron star"], ["What is the Sun's visible surface called?", "the photosphere"], ["What is the Sun's outer atmosphere called?", "the corona"]],
+  "physics": [["What is the SI unit of force?", "newton"], ["What is the SI unit of energy?", "joule"], ["What is the SI unit of power?", "watt"], ["What is the SI unit of electric current?", "ampere"], ["What is the SI unit of voltage?", "volt"], ["What is the SI unit of resistance?", "ohm"], ["What is the SI unit of frequency?", "hertz"], ["What is the SI unit of pressure?", "pascal"], ["What is the SI unit of charge?", "coulomb"], ["What is the SI unit of temperature?", "kelvin"], ["What is the SI unit of mass?", "kilogram"], ["What is the SI unit of length?", "metre"], ["What is the SI unit of time?", "second"], ["What is speed?", "distance travelled per unit time"], ["What is velocity?", "speed in a specified direction"], ["What is acceleration?", "change in velocity per unit time"], ["What is the formula for average speed?", "distance divided by time"], ["What is the formula for density?", "mass divided by volume"], ["What is the formula for force using mass and acceleration?", "F = ma"], ["What is the formula for work done by a constant force along the motion?", "work = force times distance"], ["What is the formula for power?", "energy transferred divided by time"], ["What is momentum?", "mass multiplied by velocity"], ["What is the formula for weight near Earth's surface?", "weight = mass times gravitational field strength"], ["What is the approximate gravitational field strength at Earth's surface?", "9.8 newtons per kilogram"], ["What is the tendency of an object to resist changes in motion called?", "inertia"], ["What is the force that opposes motion between surfaces called?", "friction"], ["What force pulls objects toward Earth?", "gravity"], ["What force acts upward on an object immersed in a fluid?", "upthrust"], ["What is the turning effect of a force called?", "moment"], ["What is the principle that says an object remains at rest or constant velocity unless acted on by a net force?", "Newton's first law"], ["What law states that action and reaction forces are equal and opposite?", "Newton's third law"], ["What type of energy does a moving object have?", "kinetic energy"], ["What type of energy is stored due to position or configuration?", "potential energy"], ["What is the energy stored in a stretched spring called?", "elastic potential energy"], ["What is the energy transferred because of a temperature difference called?", "thermal energy"], ["What is the rate of doing work called?", "power"], ["What is the conservation of energy principle?", "energy cannot be created or destroyed, only transferred or transformed"], ["How is heat transferred through a solid by particle interactions called?", "conduction"], ["How is heat transferred by moving fluids called?", "convection"], ["How is thermal energy transferred by electromagnetic waves called?", "radiation"], ["What is the change of direction of light at a boundary called?", "refraction"], ["What is light bouncing off a surface called?", "reflection"], ["What type of mirror forms a virtual upright image for an object in front of it?", "a plane mirror"], ["What lens is thicker in the middle and converges parallel light rays?", "a convex lens"], ["What lens is thinner in the middle and diverges parallel light rays?", "a concave lens"], ["What is the splitting of white light into colours called?", "dispersion"], ["What is the approximate speed of light in a vacuum?", "300 million metres per second"], ["What kind of wave is light?", "an electromagnetic wave"], ["What kind of wave is sound in air?", "a longitudinal wave"], ["What produces sound?", "vibrations"], ["Can sound travel through a vacuum?", "no"], ["What determines the pitch of a sound?", "frequency"], ["What is the unit of loudness level commonly used?", "decibel"], ["What is the number of wave cycles passing a point each second called?", "frequency"], ["What is the distance between matching points on consecutive waves called?", "wavelength"], ["What is the maximum displacement from a wave's rest position called?", "amplitude"], ["What is the formula relating wave speed, frequency and wavelength?", "wave speed = frequency times wavelength"], ["What is the bending of waves around obstacles called?", "diffraction"], ["What is the overlap of waves producing a combined effect called?", "interference"], ["What is the change in observed frequency due to relative motion called?", "the Doppler effect"], ["What is an electric current?", "the rate of flow of electric charge"], ["What is Ohm's law?", "voltage equals current times resistance"], ["What device measures electric current?", "an ammeter"], ["What device measures potential difference?", "a voltmeter"], ["How should an ammeter be connected in a circuit?", "in series"], ["How should a voltmeter be connected in a circuit?", "in parallel"], ["What is a material that allows charge to flow easily called?", "a conductor"], ["What is a material that resists charge flow called?", "an insulator"], ["What happens to like electric charges?", "they repel"], ["What happens to opposite electric charges?", "they attract"], ["What is the region around a magnet where magnetic forces act called?", "a magnetic field"], ["What are the two ends of a bar magnet called?", "north pole and south pole"], ["What effect can an electric current produce around a wire?", "a magnetic field"], ["What is the production of voltage by changing magnetic flux called?", "electromagnetic induction"], ["What device converts electrical energy into mechanical energy?", "an electric motor"], ["What device converts mechanical energy into electrical energy?", "a generator"], ["What is the purpose of a transformer?", "to change alternating voltage"], ["What current repeatedly reverses direction?", "alternating current"], ["What current flows in one direction?", "direct current"], ["What is the pressure exerted by a force per unit area called?", "pressure"], ["What is the formula for pressure?", "force divided by area"], ["Why does a sharp knife cut more easily than a blunt one?", "it applies greater pressure over a smaller area"], ["What is the upward force on a floating object equal to?", "the weight of the fluid displaced"], ["What is the temperature at which a liquid changes to gas throughout the liquid called?", "boiling point"], ["What is the temperature at which a solid changes to liquid called?", "melting point"], ["What is absolute zero on the Celsius scale approximately?", "minus 273.15 degrees Celsius"], ["What is the smallest unit of an element that retains its chemical identity?", "atom"], ["What is the centre of an atom called?", "nucleus"], ["What particle has a negative electric charge?", "electron"], ["What particle has a positive electric charge?", "proton"], ["What particle has no electric charge?", "neutron"], ["What is the energy of a photon related to?", "its frequency"], ["What is the bending of a material under a force and its return to shape called?", "elasticity"], ["What is the principle that pressure applied to an enclosed fluid is transmitted throughout it called?", "Pascal's principle"], ["What is the ratio of useful output energy to input energy called?", "efficiency"], ["What is the unit of capacitance?", "farad"], ["What is the unit of magnetic flux density?", "tesla"], ["What is the phenomenon in which some materials conduct electricity with zero resistance called?", "superconductivity"], ["What is the smallest discrete packet of electromagnetic energy called?", "a photon"], ["What is the process in which a heavy nucleus splits called?", "nuclear fission"]],
+  "biology": [["What is the basic structural unit of living organisms?", "cell"], ["What molecule carries hereditary information?", "DNA"], ["What cell structure contains genetic material in most animal cells?", "nucleus"], ["What cell structure controls what enters and leaves a cell?", "cell membrane"], ["What jelly-like substance fills much of a cell?", "cytoplasm"], ["What organelle releases usable energy through aerobic respiration?", "mitochondrion"], ["What cell structure carries out photosynthesis in plants?", "chloroplast"], ["What rigid outer layer supports plant cells?", "cell wall"], ["What pigment absorbs light for photosynthesis?", "chlorophyll"], ["What process allows green plants to make glucose using light?", "photosynthesis"], ["Which gas is used in photosynthesis?", "carbon dioxide"], ["Which gas is released by photosynthesis?", "oxygen"], ["What plant tissue transports water and minerals?", "xylem"], ["What plant tissue transports sugars?", "phloem"], ["What tiny openings allow gas exchange in leaves?", "stomata"], ["What plant organ usually absorbs water from soil?", "roots"], ["What is the loss of water vapour from plant leaves called?", "transpiration"], ["What is the process of releasing energy from glucose in cells called?", "cellular respiration"], ["What is the molecule often described as the cell's immediate energy currency?", "ATP"], ["What is a group of similar cells working together called?", "tissue"], ["What is a structure made of different tissues working together called?", "organ"], ["What is a group of organs working together called?", "organ system"], ["What is the scientific study of living things called?", "biology"], ["What is the study of heredity called?", "genetics"], ["What is the passing of traits from parents to offspring called?", "inheritance"], ["What is a segment of DNA associated with a trait called?", "gene"], ["What are alternative forms of a gene called?", "alleles"], ["What is the observable set of characteristics of an organism called?", "phenotype"], ["What is an organism's genetic makeup called?", "genotype"], ["What type of cell division produces two genetically similar daughter cells?", "mitosis"], ["What type of cell division produces gametes with half the chromosome number?", "meiosis"], ["What is a reproductive cell such as a sperm or egg called?", "gamete"], ["What is fertilisation?", "fusion of male and female gametes"], ["What is the process by which an embryo develops into a baby called?", "development"], ["What is the organ that pumps blood around the human body?", "heart"], ["Which blood vessels carry blood away from the heart?", "arteries"], ["Which blood vessels carry blood toward the heart?", "veins"], ["What tiny blood vessels allow exchange with tissues?", "capillaries"], ["Which blood cells transport oxygen using haemoglobin?", "red blood cells"], ["Which blood components help defend against pathogens?", "white blood cells"], ["What cell fragments help blood clot?", "platelets"], ["What is the main function of the lungs?", "gas exchange"], ["Where does gas exchange occur in the lungs?", "alveoli"], ["What tube carries air from the throat toward the lungs?", "trachea"], ["What muscle helps change chest volume during breathing?", "diaphragm"], ["What organ produces bile and processes many substances in blood?", "liver"], ["Where does most nutrient absorption occur in the digestive system?", "small intestine"], ["What organ begins digestion by chewing and mixing food with saliva?", "mouth"], ["What enzyme in saliva starts starch digestion?", "amylase"], ["What is the wave-like movement that pushes food along the gut called?", "peristalsis"], ["What organ filters blood and produces urine?", "kidney"], ["What tube carries urine from a kidney to the bladder?", "ureter"], ["What organ stores urine before it leaves the body?", "bladder"], ["What body system coordinates rapid responses using electrical signals?", "nervous system"], ["What organ is the main control centre of the nervous system?", "brain"], ["What protects the brain?", "skull"], ["What is the basic functional cell of the nervous system called?", "neuron"], ["What body system produces hormones?", "endocrine system"], ["What chemical messenger is released by endocrine glands?", "hormone"], ["Which hormone helps lower blood glucose?", "insulin"], ["What is the body's ability to resist disease called?", "immunity"], ["What microorganism causes malaria?", "Plasmodium"], ["What type of pathogen causes influenza?", "virus"], ["What type of pathogen is yeast?", "fungus"], ["What is the spread of a pathogen from one host to another called?", "transmission"], ["What is a substance that triggers a specific immune response called?", "antigen"], ["What is a vaccine designed to do?", "train the immune system to recognise a pathogen"], ["What is the variety of living organisms in an area called?", "biodiversity"], ["What is an organism's role in its ecosystem called?", "ecological niche"], ["What is a community of organisms interacting with their environment called?", "ecosystem"], ["What is an organism that makes its own food called?", "producer"], ["What is an organism that eats other organisms called?", "consumer"], ["What is an organism that breaks down dead matter called?", "decomposer"], ["What is the original source of energy for most food chains?", "the Sun"], ["What is the position of an organism in a food chain called?", "trophic level"], ["What is the process by which populations become better adapted over generations called?", "natural selection"], ["What is a change in inherited DNA sequence called?", "mutation"], ["What is the name for the scientific naming system using two words?", "binomial nomenclature"], ["What is the study of interactions between organisms and their environment called?", "ecology"], ["What is the relationship where both species benefit called?", "mutualism"], ["What is the relationship where one species benefits and the other is harmed called?", "parasitism"], ["What is the relationship where one organism hunts another called?", "predation"], ["What is the movement of water across a selectively permeable membrane called?", "osmosis"], ["What is the movement of particles from higher to lower concentration called?", "diffusion"], ["What is movement of substances against a concentration gradient using energy called?", "active transport"], ["What is the process of maintaining stable internal conditions called?", "homeostasis"], ["What is the normal range of human body temperature approximately?", "about 37 degrees Celsius"], ["What is the hard outer covering of many insects called?", "exoskeleton"], ["What group of animals has feathers?", "birds"], ["What group of animals feeds young with milk?", "mammals"], ["What group of vertebrates typically has moist skin and undergoes metamorphosis?", "amphibians"], ["What is the change from a larva into an adult called?", "metamorphosis"], ["What is the transfer of pollen from anther to stigma called?", "pollination"], ["What is the male reproductive part of a flower called?", "stamen"], ["What is the female reproductive part of a flower called?", "carpel"], ["What is the growth of a plant toward light called?", "phototropism"], ["What is the name for an organism that makes its own food using light?", "photoautotroph"], ["What is the process by which organisms produce offspring called?", "reproduction"], ["What is the death and replacement of cells in normal body maintenance called?", "cell turnover"], ["What is the movement of a cell or organism toward a stimulus called?", "taxis"]],
+  "chemistry": [["What is the smallest unit of an element that retains its identity?", "atom"], ["What is the positively charged particle in an atomic nucleus?", "proton"], ["What is the negatively charged subatomic particle?", "electron"], ["What subatomic particle has no electric charge?", "neutron"], ["What determines the atomic number of an element?", "number of protons"], ["What is the central part of an atom called?", "nucleus"], ["What is a substance made of only one type of atom called?", "element"], ["What is a substance containing two or more elements chemically bonded called?", "compound"], ["What is a mixture?", "substances together that are not chemically bonded"], ["What is the chemical symbol for hydrogen?", "H"], ["What is the chemical symbol for oxygen?", "O"], ["What is the chemical symbol for sodium?", "Na"], ["What is the chemical symbol for potassium?", "K"], ["What is the chemical symbol for iron?", "Fe"], ["What is the chemical symbol for copper?", "Cu"], ["What is the chemical symbol for silver?", "Ag"], ["What is the chemical symbol for gold?", "Au"], ["What is the chemical symbol for carbon?", "C"], ["What is the chemical symbol for nitrogen?", "N"], ["What is the chemical symbol for chlorine?", "Cl"], ["What is the horizontal row in the periodic table called?", "period"], ["What is the vertical column in the periodic table called?", "group"], ["What are elements in Group 18 commonly called?", "noble gases"], ["What are Group 1 elements commonly called?", "alkali metals"], ["What are elements that conduct heat and electricity well usually called?", "metals"], ["What is the state of matter with fixed shape and fixed volume?", "solid"], ["What is the state of matter with fixed volume but no fixed shape?", "liquid"], ["What is the state of matter that expands to fill its container?", "gas"], ["What is the change from solid to liquid called?", "melting"], ["What is the change from liquid to solid called?", "freezing"], ["What is the change from liquid to gas at a surface called?", "evaporation"], ["What is the change from gas to liquid called?", "condensation"], ["What is the direct change from solid to gas called?", "sublimation"], ["What is the temperature at which pure water boils at standard pressure?", "100 degrees Celsius"], ["What is the pH of a neutral aqueous solution at about 25 degrees Celsius?", "7"], ["What pH range is typical of acidic solutions?", "below 7"], ["What pH range is typical of alkaline solutions?", "above 7"], ["What is a substance that changes colour to show acidity or alkalinity called?", "indicator"], ["What acid is found in vinegar?", "ethanoic acid"], ["What acid is naturally present in the stomach?", "hydrochloric acid"], ["What gas is commonly produced when many acids react with metals?", "hydrogen"], ["What gas is produced when an acid reacts with a carbonate?", "carbon dioxide"], ["What is the reaction between an acid and a base called?", "neutralisation"], ["What products usually form when an acid neutralises a base?", "salt and water"], ["What is the chemical formula for water?", "H2O"], ["What is the chemical formula for carbon dioxide?", "CO2"], ["What is the chemical formula for oxygen gas?", "O2"], ["What is the chemical formula for table salt?", "NaCl"], ["What is the chemical formula for methane?", "CH4"], ["What is the chemical formula for ammonia?", "NH3"], ["What is the chemical formula for sulfuric acid?", "H2SO4"], ["What is the chemical formula for hydrochloric acid?", "HCl"], ["What is the chemical formula for calcium carbonate?", "CaCO3"], ["What is the chemical formula for glucose?", "C6H12O6"], ["What are the starting substances in a chemical reaction called?", "reactants"], ["What are the substances formed in a chemical reaction called?", "products"], ["What principle says total mass is conserved in a closed chemical system?", "conservation of mass"], ["What is a reaction that releases energy to the surroundings called?", "exothermic reaction"], ["What is a reaction that absorbs energy from the surroundings called?", "endothermic reaction"], ["What is burning in oxygen called?", "combustion"], ["What is the slow reaction of iron with oxygen and water called?", "rusting"], ["What is the minimum energy needed to start a reaction called?", "activation energy"], ["What substance speeds up a reaction without being used up overall?", "catalyst"], ["What is the measure of how much solute dissolves in a given amount of solvent called?", "solubility"], ["What is the substance that dissolves another substance called?", "solvent"], ["What is the substance dissolved in a solution called?", "solute"], ["What is a solution containing as much dissolved solute as possible at a given temperature called?", "saturated solution"], ["What method separates an insoluble solid from a liquid using a barrier?", "filtration"], ["What method separates dissolved solids from a solution by forming crystals?", "crystallisation"], ["What method separates liquids with different boiling points?", "distillation"], ["What method separates coloured substances using a moving solvent?", "chromatography"], ["What is the change from a liquid to vapour throughout the liquid called?", "boiling"], ["What is the number of particles in one mole called?", "Avogadro constant"], ["What is the amount of substance measured in?", "mole"], ["What is the mass per unit volume of a substance called?", "density"], ["What type of bond forms when atoms share electron pairs?", "covalent bond"], ["What type of bond forms through attraction between oppositely charged ions?", "ionic bond"], ["What type of bond holds metal atoms together through delocalised electrons?", "metallic bond"], ["What is an ion with a positive charge called?", "cation"], ["What is an ion with a negative charge called?", "anion"], ["What is oxidation often described as in terms of electrons?", "loss of electrons"], ["What is reduction often described as in terms of electrons?", "gain of electrons"], ["What is the process of coating an object with a metal using electricity called?", "electroplating"], ["What is the separation of a compound using electricity called?", "electrolysis"], ["What is the main gas in Earth's atmosphere?", "nitrogen"], ["What gas is needed for ordinary combustion?", "oxygen"], ["What is the most abundant element in the universe?", "hydrogen"], ["What is the most abundant element in Earth's crust by mass?", "oxygen"], ["What is a pure substance with a fixed composition and characteristic properties called?", "chemical substance"], ["What is the ability of a material to be drawn into a wire called?", "ductility"], ["What is the ability of a material to be hammered into sheets called?", "malleability"], ["What is the measure of resistance to scratching called?", "hardness"], ["What is the process of separating crude oil into fractions called?", "fractional distillation"], ["What is a large molecule made from repeating smaller units called?", "polymer"], ["What are the small repeating units of a polymer called?", "monomers"], ["What type of change produces a new substance?", "chemical change"], ["What type of change changes form without making a new substance?", "physical change"], ["What is the formula for calculating concentration in g/dm3?", "mass of solute divided by volume of solution"], ["What is the name of a substance that accepts a proton in the Brønsted–Lowry model?", "base"], ["What is the name of a substance that donates a proton in the Brønsted–Lowry model?", "acid"]],
+  "earth": [["What is Earth's outermost solid layer called?", "crust"], ["What layer lies beneath Earth's crust?", "mantle"], ["What is Earth's central layer called?", "core"], ["What is the rigid outer shell of Earth, divided into tectonic plates, called?", "lithosphere"], ["What are Earth's large moving surface sections called?", "tectonic plates"], ["What is the theory explaining movement of tectonic plates called?", "plate tectonics"], ["What natural event is caused by sudden movement along a fault?", "earthquake"], ["What opening allows magma, gases and ash to escape from a volcano?", "volcanic vent"], ["What is molten rock beneath Earth's surface called?", "magma"], ["What is molten rock that reaches Earth's surface called?", "lava"], ["What type of rock forms when magma or lava cools?", "igneous rock"], ["What type of rock forms from compacted and cemented sediment?", "sedimentary rock"], ["What type of rock forms when existing rock is changed by heat and pressure?", "metamorphic rock"], ["What is the breakdown of rock in place called?", "weathering"], ["What is the movement of weathered material from one place to another called?", "erosion"], ["What is the settling of transported sediment called?", "deposition"], ["What is the process by which water enters the ground called?", "infiltration"], ["What is water stored beneath Earth's surface in saturated rock or sediment called?", "groundwater"], ["What is the upper surface of groundwater called?", "water table"], ["What is a permeable rock or sediment layer that stores and transmits groundwater called?", "aquifer"], ["What is the continuous movement of water between Earth's surface and atmosphere called?", "water cycle"], ["What process changes liquid water into water vapour?", "evaporation"], ["What process changes water vapour into liquid droplets?", "condensation"], ["What is water falling from clouds as rain, snow or hail called?", "precipitation"], ["What is water flowing over land rather than soaking in called?", "surface runoff"], ["What is the change of ice directly into water vapour called?", "sublimation"], ["What is the long-term average pattern of weather called?", "climate"], ["What describes atmospheric conditions at a particular time and place?", "weather"], ["What instrument measures air temperature?", "thermometer"], ["What instrument measures atmospheric pressure?", "barometer"], ["What instrument measures wind speed?", "anemometer"], ["What instrument measures rainfall?", "rain gauge"], ["What instrument measures relative humidity?", "hygrometer"], ["What is the amount of water vapour in air called?", "humidity"], ["What is moving air called?", "wind"], ["What is the boundary between two air masses called?", "front"], ["What type of front often brings a rapid change in weather when cold air replaces warm air?", "cold front"], ["What is a rotating storm with a funnel-shaped cloud called?", "tornado"], ["What is a large rotating tropical storm called in the Atlantic?", "hurricane"], ["What is the centre of a hurricane called?", "the eye"], ["What scale is commonly used to describe hurricane wind intensity?", "Saffir-Simpson scale"], ["What is the average weather pattern over a long period in a region called?", "climate"], ["What gas is a major contributor to human-caused global warming?", "carbon dioxide"], ["What is the gradual increase in Earth's average surface temperature called?", "global warming"], ["What is the trapping of heat by atmospheric gases called?", "the greenhouse effect"], ["What is the long-term shift in temperatures and weather patterns called?", "climate change"], ["What is the variety of life in a region called?", "biodiversity"], ["What ecosystem is dominated by trees and has high rainfall year-round?", "tropical rainforest"], ["What biome has very low precipitation and sparse vegetation?", "desert"], ["What is the largest ocean on Earth?", "Pacific Ocean"], ["What is the smallest ocean on Earth?", "Arctic Ocean"], ["What is the deepest known ocean trench called?", "Mariana Trench"], ["What is the deepest point known in the ocean called?", "Challenger Deep"], ["What is the layer of gases surrounding Earth called?", "atmosphere"], ["Which atmospheric layer contains most weather?", "troposphere"], ["Which atmospheric layer contains much of the ozone layer?", "stratosphere"], ["What does the ozone layer absorb from the Sun?", "much of the ultraviolet radiation"], ["What is the outermost major layer of Earth's atmosphere called?", "exosphere"], ["What is the boundary between Earth's crust and mantle called?", "Mohorovičić discontinuity"], ["What is the boundary between the mantle and outer core called?", "Gutenberg discontinuity"], ["What is the solid innermost part of Earth's core called?", "inner core"], ["What is the liquid layer surrounding Earth's inner core called?", "outer core"], ["What generates most of Earth's magnetic field?", "movement of liquid iron in the outer core"], ["What is the name of the supercontinent that existed hundreds of millions of years ago?", "Pangaea"], ["What is the study of rocks called?", "petrology"], ["What is the study of fossils called?", "paleontology"], ["What preserved evidence of ancient life is found in rock called?", "fossil"], ["What is the age of a rock compared with another rock called when ordered without exact years?", "relative age"], ["What dating method uses radioactive decay to estimate numerical ages?", "radiometric dating"], ["What is the principle that lower sedimentary layers are generally older than layers above them called?", "law of superposition"], ["What is a break in the rock record caused by erosion or non-deposition called?", "unconformity"], ["What is the process of soil formation called?", "pedogenesis"], ["What is the upper fertile layer of soil rich in organic matter called?", "topsoil"], ["What is decayed organic material in soil called?", "humus"], ["What is the movement of soil and rock downhill under gravity called?", "mass wasting"], ["What is the sudden movement of rock and soil down a slope called?", "landslide"], ["What is the shaking of the ground caused by seismic waves called?", "an earthquake"], ["What instrument records ground motion from earthquakes?", "seismometer"], ["What is the point inside Earth where an earthquake starts called?", "focus"], ["What is the point on Earth's surface directly above an earthquake focus called?", "epicentre"], ["What type of seismic wave arrives first and travels through solids and liquids?", "P-wave"], ["What type of seismic wave cannot travel through liquids?", "S-wave"], ["What is a large ocean wave often caused by undersea displacement called?", "tsunami"], ["What is the wearing away of coastlines by waves called?", "coastal erosion"], ["What is the rise and fall of sea level caused mainly by the Moon's and Sun's gravity called?", "tides"], ["What is the boundary between a river and the sea where freshwater mixes with saltwater called?", "estuary"], ["What is the area of land drained by a river and its tributaries called?", "drainage basin"], ["What is the place where a river enters a lake or sea called?", "river mouth"], ["What is a bend in a winding river called?", "meander"], ["What is a fan-shaped deposit formed where a river enters standing water called?", "delta"], ["What is the frozen water stored in glaciers and ice sheets called?", "glacial ice"], ["What is the slow movement of a large mass of ice called?", "glacial flow"], ["What is the process of removing salt from seawater called?", "desalination"], ["What is the sustainable management of natural resources intended to preserve?", "resources for future generations"], ["What is the measurement of how much land and water a population needs to support its lifestyle called?", "ecological footprint"], ["What is the restoration of a damaged ecosystem called?", "ecological restoration"], ["What is the use of sunlight to generate electricity called?", "solar power"], ["What is energy from moving air called?", "wind energy"], ["What is the study of Earth's atmosphere and weather processes called?", "meteorology"], ["What is the boundary where two tectonic plates move apart called?", "divergent boundary"]],
+  "technology": [["What does CPU stand for?", "central processing unit"], ["What does RAM stand for?", "random access memory"], ["What does ROM stand for?", "read-only memory"], ["What is the physical equipment of a computer called?", "hardware"], ["What are computer programs and instructions called?", "software"], ["What device is commonly used to type text into a computer?", "keyboard"], ["What device displays visual output from a computer?", "monitor"], ["What device produces printed pages?", "printer"], ["What device captures sound for a computer?", "microphone"], ["What device captures still images or video for a computer?", "camera"], ["What is the main circuit board of a computer called?", "motherboard"], ["What computer component performs most general-purpose instruction processing?", "CPU"], ["What type of memory temporarily stores data currently in use?", "RAM"], ["What kind of storage retains data when power is off?", "non-volatile storage"], ["What does SSD stand for?", "solid-state drive"], ["What does HDD stand for?", "hard disk drive"], ["What is a small portable computer that fits on a lap called?", "laptop"], ["What is software used to manage computer hardware and applications called?", "operating system"], ["Name one widely used desktop operating system.", "Windows"], ["What is the process of starting a computer and loading its operating system called?", "booting"], ["What is a step-by-step procedure for solving a problem called?", "algorithm"], ["What is an error in a computer program often called?", "bug"], ["What is the process of finding and correcting program errors called?", "debugging"], ["What does HTML describe on a web page?", "structure"], ["What does CSS control on a web page?", "styling"], ["Which language adds interactivity to many web pages?", "JavaScript"], ["What is a collection of linked web pages under one domain called?", "website"], ["What software requests and displays web pages?", "web browser"], ["What is the address of a resource on the web called?", "URL"], ["What does HTTP stand for?", "Hypertext Transfer Protocol"], ["What does HTTPS add to HTTP?", "encryption using TLS"], ["What system translates domain names into IP addresses?", "DNS"], ["What is a unique numerical label used to identify a device on an IP network called?", "IP address"], ["What is a network covering a small area such as a home or school called?", "LAN"], ["What is a network spanning a large geographical area called?", "WAN"], ["What device forwards data between different networks?", "router"], ["What device connects devices within a local network?", "switch"], ["What technology allows wireless networking in homes and public places?", "Wi-Fi"], ["What does Bluetooth commonly connect over short distances?", "nearby devices"], ["What is a small unit of data transmitted over a network called?", "packet"], ["What is the global system of interconnected computer networks called?", "the internet"], ["What is a private network restricted to an organisation called?", "intranet"], ["What is an online service that stores files on remote servers called?", "cloud storage"], ["What is a harmful program designed to damage or disrupt systems called?", "malware"], ["What is software that secretly gathers information about a user called?", "spyware"], ["What is a deceptive attempt to steal passwords through fake messages or websites called?", "phishing"], ["What is a long, unique secret used to access an account called?", "password"], ["What security method requires two different forms of verification called?", "multi-factor authentication"], ["What is the process of converting readable information into coded form to protect it called?", "encryption"], ["What is a copy of data kept for recovery called?", "backup"], ["What is a weakness that an attacker could exploit called?", "vulnerability"], ["What is a security update that fixes known software problems called?", "patch"], ["What does AI stand for?", "artificial intelligence"], ["What is machine learning?", "a method where systems learn patterns from data"], ["What is a set of examples used to train a machine-learning model called?", "training data"], ["What is the output produced by an AI model called?", "prediction"], ["What is the field of AI that enables computers to process human language called?", "natural language processing"], ["What is the field that enables computers to interpret images called?", "computer vision"], ["What is a robot component that detects its surroundings called?", "sensor"], ["What is a component that produces movement in a robot called?", "actuator"], ["What is the program controlling a robot's actions called?", "control software"], ["What is a machine that performs tasks automatically using sensors and actuators called?", "robot"], ["What is the science of designing and operating robots called?", "robotics"], ["What is a device that measures physical conditions and sends data called?", "sensor"], ["What is the process of making a physical object from a digital model by adding material layer by layer called?", "3D printing"], ["What is the use of code to give computers instructions called?", "programming"], ["What is a named storage location in a program called?", "variable"], ["What is a reusable block of code designed to perform a task called?", "function"], ["What is a decision structure that runs code only when a condition is true called?", "conditional"], ["What is a sequence of instructions repeated while a condition holds called?", "loop"], ["What is a data structure containing an ordered collection of values called?", "list"], ["What is a named collection of related data fields often used in databases called?", "record"], ["What is software whose source code can be inspected and modified under its licence called?", "open-source software"], ["What is a computer language translated into machine code before execution called?", "compiled language"], ["What is a computer language often executed by an interpreter or runtime called?", "interpreted language"], ["What is a database?", "an organised collection of data"], ["What language is widely used to query relational databases?", "SQL"], ["What does GUI stand for?", "graphical user interface"], ["What does UI stand for?", "user interface"], ["What does UX focus on?", "user experience"], ["What is the design approach that adapts a website to different screen sizes called?", "responsive design"], ["What is the practice of making digital products usable by people with different abilities called?", "accessibility"], ["What is the process of checking whether software behaves as expected called?", "testing"], ["What is a change made to software to add features or fix problems called?", "update"], ["What is a digital file's unique fingerprint often used to check integrity called?", "hash"], ["What is a public online record of changes to source code often managed with Git called?", "version history"], ["What is a system that tracks and manages source-code changes called?", "version control"], ["What is a program that translates source code into another form called?", "compiler"], ["What is a small computer embedded in a device to control a specific task called?", "microcontroller"], ["What is a single chip containing a processor and related components called?", "system-on-a-chip"], ["What is the network of physical devices exchanging data through sensors and connectivity called?", "Internet of Things"], ["What is a computer designed to provide resources or services to other computers called?", "server"], ["What is a computer that requests services from a server called?", "client"], ["What is a digital system that represents information using two symbols, 0 and 1, called?", "binary"], ["What is one binary digit called?", "bit"], ["How many bits are in a standard byte?", "eight"], ["What unit is commonly used for processor clock frequency?", "hertz"], ["What is a device that converts digital information to a physical signal or vice versa called?", "interface"], ["What is the process of making digital information available to authorised users but not others called?", "access control"], ["What should you do before sharing personal information on an unfamiliar website?", "check that the website is trustworthy"]]
+};
+
+
+function makeQuestions(cat, week) {
+  const field = fields.find(f => f.id === cat);
+  const fieldLessons = lessons.filter(l => l.cat === cat);
+  const relatedLesson = fieldLessons[0] || lessons[0];
+  const questions = (questionBank[cat] || questionBank.space).map((item, index) => ({
+    q: item[0],
+    a: item[1],
+    hint: "Think about the key idea in this question. You can review the " + field.name + " lessons for help.",
+    explanation: "Answer: " + item[1] + ". Review the relevant " + field.name + " concepts to understand why.",
+    lesson: relatedLesson.id
+  }));
+
+  // Shuffle the 100 distinct questions so the same field does not always begin identically.
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  return questions;
+}
+
+function setupQuiz() {
+  $("quizCat").innerHTML = fields.map(f =>
+    `<option value="${f.id}">${f.icon} ${f.name}</option>`
+  ).join("");
+  $("quizCat").onchange = () => startQuiz($("quizCat").value);
+}
+
+function startQuiz(cat) {
+  $("quizCat").value = cat;
+  pool = makeQuestions(cat, 1);
+  qi = 0;
+  streak = 0;
+  session = 0;
+  showQuestion();
+  page("quiz");
+}
+
+function showQuestion() {
+  const q = pool[qi];
+  if (!q) return;
+  locked = false;
+  $("qCount").textContent = (qi+1) + " / " + pool.length;
+  $("question").textContent = q.q;
+  $("hint").textContent = "";
+  $("answer").value = "";
+  $("answer").disabled = false;
+  $("feedback").innerHTML = "";
+  $("qBar").style.width = (qi / pool.length * 100) + "%";
+  $("qScore").textContent = session;
+  $("qStreak").textContent = streak;
+  $("nextBtn").textContent =
+    qi === pool.length-1 ? "Finish Quiz →" : "Next Question →";
+}
+
+$("answerForm").onsubmit = e => {
+  e.preventDefault();
+  if (locked) return;
+
+  const q = pool[qi];
+  const answer = normal($("answer").value);
+  if (!answer) return;
+
+  locked = true;
+  const correct = answer === normal(q.a);
+  const stats = getStats();
+  stats.done++;
+
+  if (correct) {
+    stats.correct++;
+    session++;
+    streak++;
+  } else {
+    streak = 0;
+  }
+
+  putStats(stats);
+
+  if (correct) {
+    $("feedback").innerHTML =
+      `<div class="feedback good"><strong>✨ Correct! Great work!</strong><br>${q.explanation}</div>`;
+  } else {
+    $("feedback").innerHTML =
+      `<div class="feedback bad"><strong>Good try! Keep learning.</strong><br>
+      Accepted answer: <b>${q.a}</b><br>${q.explanation}
+      <br><button class="secondary" type="button"
+      onclick="openLesson('${q.lesson}')">Read Related Lesson</button></div>`;
+  }
+
+  $("answer").disabled = true;
+  $("qScore").textContent = session;
+  $("qStreak").textContent = streak;
+  $("qBar").style.width = ((qi+1) / pool.length * 100) + "%";
+  updateProgress();
+};
+
+$("hintBtn").onclick = () => {
+  if (pool[qi]) $("hint").textContent = "💡 Hint: " + pool[qi].hint;
+};
+
+$("nextBtn").onclick = () => {
+  if (!locked) {
+    $("feedback").innerHTML =
+      '<div class="feedback bad">Write an answer and check it first.</div>';
+    return;
+  }
+
+  if (qi < pool.length-1) {
+    qi++;
+    showQuestion();
+  } else {
+    alert("Quiz completed! Correct answers: " + session + " / " + pool.length);
+    startQuiz($("quizCat").value);
+  }
+};
+
+$("randomBtn").onclick = () => {
+  qi = Math.floor(Math.random() * pool.length);
+  showQuestion();
+};
+
+function updateProgress() {
+  const stats = getStats();
+  const percent = stats.done
+    ? Math.round(stats.correct / stats.done * 100)
+    : 0;
+
+  $("homeDone").textContent = stats.done;
+  $("homeCorrect").textContent = stats.correct;
+  $("pDone").textContent = stats.done;
+  $("pCorrect").textContent = stats.correct;
+  $("pPercent").textContent = percent + "%";
+
+  const badges = [];
+  if (stats.correct >= 1) badges.push("🌱 First Discovery");
+  if (stats.correct >= 10) badges.push("🔭 Star Explorer");
+  if (stats.correct >= 25) badges.push("🧪 Science Solver");
+  if (stats.correct >= 50) badges.push("🏆 Knowledge Champion");
+
+  $("pBadges").textContent = badges.length;
+  $("badges").textContent = badges.join(" · ") ||
+    "Answer questions to earn your first badge!";
+
+  $("progressText").textContent = stats.done
+    ? "You have attempted " + stats.done + " questions and answered " +
+      stats.correct + " correctly. Keep practising!"
+    : "Your learning journey starts with one question.";
+}
+
+$("reset").onclick = () => {
+  if (confirm("Reset saved progress on this browser?")) {
+    putStats({done:0, correct:0});
+    updateProgress();
+  }
+};
+
+renderCategories();
+listLessons();
+renderLesson(lessons[0]);
+setupQuiz();
+startQuiz("space");
+updateProgress();
+page("home");
+</script>
+</body>
+</html>
